@@ -1,27 +1,24 @@
 import from "@jac/runtime" { Link, useLocation, Outlet }
 import from "@hugeicons/react" { HugeiconsIcon }
-import from "@hugeicons/core-free-icons" { Airplane01Icon, Folder01Icon, Mic01Icon, AiBrain01Icon }
-import from .ui.sidebar {
-    SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarFooter,
-    SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuItem,
-    SidebarMenuButton, SidebarInset, SidebarTrigger
-}
-import from .ui.separator { Separator }
+import from "@hugeicons/core-free-icons" { Airplane01Icon, Folder01Icon, Mic01Icon, AiBrain01Icon, UserGroupIcon, DashboardSquare01Icon }
 import from .ui.sonner_toast { Toaster }
 
 glob NAV: list[dict] = [
-    {"label": "Trips", "to": "/trips", "icon": Folder01Icon},
-    {"label": "Plan by voice", "to": "/trips/new", "icon": Mic01Icon},
-    {"label": "Traveler memory", "to": "/memory", "icon": AiBrain01Icon}
+    {"label": "Trips", "to": "/trips", "icon": Folder01Icon, "group": "TRIP"},
+    {"label": "AI Concierge", "to": "/trips/new", "icon": Mic01Icon, "group": "TRIP"},
+    {"label": "Travelers", "to": "/memory", "icon": UserGroupIcon, "group": "COMPANY"},
+    {"label": "Traveler memory", "to": "/memory", "icon": AiBrain01Icon, "group": "YOU"}
 ];
 
-def:pub BrandMark(inverted: bool = False) -> JsxElement {
-    tile = "bg-primary-foreground/15 text-primary-foreground" if inverted else "bg-primary text-primary-foreground shadow-sm";
-    return <div className="flex items-center gap-2.5">
-        <div className={"flex size-8 items-center justify-center rounded-lg " + tile}>
-            <HugeiconsIcon icon={Airplane01Icon} strokeWidth={2} className="size-4" />
+def:pub BrandMark() -> JsxElement {
+    return <div className="flex items-center gap-3">
+        <span className="flex size-9 items-center justify-center rounded-[10px] bg-primary/15 text-primary ring-1 ring-primary/30">
+            <HugeiconsIcon icon={Airplane01Icon} strokeWidth={2} className="size-5" />
+        </span>
+        <div className="flex flex-col">
+            <span className="text-sm font-semibold tracking-[0.22em]">WAYPORT</span>
+            <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Travel OS</span>
         </div>
-        <span className="text-base font-semibold tracking-tight">WAYPORT</span>
     </div>;
 }
 
@@ -31,45 +28,64 @@ def:pub AppLayout() -> JsxElement {
     for item in NAV {
         if path == item["to"] { title = item["label"]; }
     }
-    if path.startswith("/trips/") and path != "/trips/new" { title = "Trip"; }
-    return <SidebarProvider>
-        <Sidebar variant="inset">
-            <SidebarHeader><div className="flex flex-col gap-2 pt-1 pb-3 pl-2 pr-2"><BrandMark /><p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">TEAM TRAVEL DESK</p></div></SidebarHeader>
-            <SidebarContent>
-                <SidebarGroup>
-                    <SidebarGroupLabel>Agents</SidebarGroupLabel>
-                    <SidebarMenu>
-                        {for item in NAV {
-                            <SidebarMenuItem key={item["to"]}>
-                                <SidebarMenuButton asChild={True} isActive={path == item["to"]}>
-                                    <Link to={item["to"]}>
-                                        <HugeiconsIcon icon={item["icon"]} strokeWidth={2} />
-                                        <span>{item["label"]}</span>
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        }}
-                    </SidebarMenu>
-                </SidebarGroup>
-            </SidebarContent>
-            <SidebarFooter>
-                <div className="rounded-lg border border-sidebar-border bg-sidebar-accent/60 pt-3 pb-3 pl-3 pr-3 text-xs text-muted-foreground">
-                    <p className="font-medium text-foreground">WAYPORT LABS</p>
-                    <p>Agentic travel, built around your team.</p>
-                    <div className="mt-2 flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-primary" /><span>Planner · Memory · Finance</span></div>
+    if path.startswith("/trips/") and path != "/trips/new" { title = "Trip detail"; }
+
+    return <div className="flex min-h-screen bg-background text-foreground">
+        <aside className="sticky top-0 flex h-screen w-[248px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
+            <div className="flex flex-col gap-4 border-b border-sidebar-border px-4 py-4">
+                <Link to="/trips" className="w-fit"><BrandMark /></Link>
+                <div className="flex items-center gap-2.5 rounded-lg border border-sidebar-border bg-sidebar-accent/40 px-3 py-2.5">
+                    <span className="flex size-7 items-center justify-center rounded-md bg-primary/15 text-[10px] font-semibold text-primary">WL</span>
+                    <div className="min-w-0 flex-1">
+                        <p className="truncate text-xs font-medium">Wayport Labs</p>
+                        <p className="text-[10px] text-muted-foreground">Company workspace</p>
+                    </div>
+                    <span className="text-xs text-muted-foreground">⌄</span>
                 </div>
-            </SidebarFooter>
-        </Sidebar>
-        <SidebarInset>
-            <header className="flex h-14 shrink-0 items-center gap-2 border-b pl-4 pr-4">
-                <SidebarTrigger />
-                <Separator orientation="vertical" className="mr-2 h-4" />
-                <span className="text-sm font-medium">{title}</span>
+            </div>
+            <nav className="flex-1 overflow-y-auto px-3 py-4">
+                <p className="mb-2 px-2 text-[10px] font-semibold tracking-[0.18em] text-muted-foreground">TRIP</p>
+                <div className="flex flex-col gap-1">
+                    {for item in NAV {
+                        if item["group"] == "TRIP" {
+                            <Link key={item["to"]} to={item["to"]} className={"flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors " + ("bg-sidebar-accent text-sidebar-accent-foreground" if path == item["to"] else "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground")}>
+                                <HugeiconsIcon icon={item["icon"]} strokeWidth={2} className="size-4" />
+                                <span>{item["label"]}</span>
+                            </Link>
+                        }
+                    }}
+                </div>
+                <p className="mb-2 mt-6 px-2 text-[10px] font-semibold tracking-[0.18em] text-muted-foreground">COMPANY</p>
+                <Link to="/memory" className={"flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors " + ("bg-sidebar-accent text-sidebar-accent-foreground" if path == "/memory" else "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground")}>
+                    <HugeiconsIcon icon={UserGroupIcon} strokeWidth={2} className="size-4" />
+                    <span>Travelers & memory</span>
+                </Link>
+                <p className="mb-2 mt-6 px-2 text-[10px] font-semibold tracking-[0.18em] text-muted-foreground">YOU</p>
+                <Link to="/memory" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent/60 hover:text-foreground">
+                    <HugeiconsIcon icon={AiBrain01Icon} strokeWidth={2} className="size-4" />
+                    <span>Traveler memory</span>
+                </Link>
+            </nav>
+            <div className="border-t border-sidebar-border p-3">
+                <div className="rounded-lg border border-sidebar-border bg-sidebar-accent/30 p-3">
+                    <p className="text-xs font-medium">Your travel agents</p>
+                    <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">Planner · Memory · Finance · Voice</p>
+                    <div className="mt-2 flex items-center gap-1.5 text-[10px] text-muted-foreground"><span className="size-1.5 rounded-full bg-primary" />Workspace ready</div>
+                </div>
+            </div>
+        </aside>
+        <div className="flex min-w-0 flex-1 flex-col">
+            <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-background/90 px-5">
+                <div className="flex items-center gap-2 text-sm">
+                    <HugeiconsIcon icon={DashboardSquare01Icon} strokeWidth={2} className="size-4 text-primary" />
+                    <span className="font-medium">{title}</span>
+                </div>
+                <span className="text-xs text-muted-foreground">WAYPORT LABS</span>
             </header>
-            <main className="flex flex-1 flex-col gap-6 pt-6 pb-8 pl-4 pr-4 md:pl-8 md:pr-8 animate-in fade-in slide-in-from-bottom-1 duration-500">
+            <main className="flex min-w-0 flex-1 flex-col gap-6 p-5 md:p-7">
                 <Outlet />
             </main>
-        </SidebarInset>
+        </div>
         <Toaster />
-    </SidebarProvider>;
+    </div>;
 }
