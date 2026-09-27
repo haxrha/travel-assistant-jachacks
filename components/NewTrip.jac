@@ -104,14 +104,15 @@ def:pub NewTrip() -> JsxElement {
     return <div className="grid gap-6 lg:grid-cols-3">
         <div className="flex flex-col gap-6 lg:col-span-2">
             <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-semibold tracking-tight">Plan a trip by voice</h1>
-                <p className="text-sm text-muted-foreground">Plan a company offsite with a shared budget, team preferences and a decision trail.</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-primary">AI CONCIERGE · COMPANY TRAVEL</p>
+                <h1 className="text-3xl font-semibold tracking-tight">Describe the trip. We’ll handle the system.</h1>
+                <p className="text-sm text-muted-foreground">Set the destination, dates and budget. Your team’s preferences and travel policy shape the itinerary.</p>
             </div>
             <Card className="shadow-sm">
                 <CardContent className="flex flex-col gap-6 pt-2">
                     <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-muted/40 pt-3 pb-3 pl-4 pr-4">
-                        <div><p className="text-sm font-medium">Wayport Labs · Lisbon offsite</p><p className="text-xs text-muted-foreground">3 days · 4 teammates · $4,000 shared budget</p></div>
-                        <Button variant="outline" size="sm" onClick={lambda { prompt = "Plan a 3-day company offsite in Lisbon for Wayport Labs. Total team budget is $4,000. Include flights, centrally located lodging, a team dinner and a half-day strategy session."; }}>Load demo trip</Button>
+                        <div><p className="text-sm font-medium">Live demo · Wayport Labs in Lisbon</p><p className="text-xs text-muted-foreground">Three days · four travelers · one shared budget</p></div>
+                        <Button variant="outline" size="sm" onClick={lambda { prompt = "Plan a three-day Wayport Labs offsite in Lisbon for four travelers with a $4,000 total budget. Find flights and centrally located hotels, include a team dinner and half-day strategy session, and account for each teammate's travel preferences."; }}>Load demo trip</Button>
                     </div>
                     <div className="flex flex-col items-center gap-4 pt-4 pb-2">
                         <button

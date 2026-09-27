@@ -33,8 +33,8 @@ def:pub TripsList() -> JsxElement {
         <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="flex flex-col gap-1">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-primary">WAYPORT · LIVE GRAPH</p>
-                <h1 className="text-3xl font-semibold tracking-tight">Command Center</h1>
-                <p className="text-sm text-muted-foreground">Your company travel, coordinated by autonomous agents.</p>
+                <h1 className="max-w-3xl text-3xl font-semibold leading-tight tracking-tight md:text-4xl">Nobody should spend a week booking a three-day offsite.</h1>
+                <p className="max-w-2xl text-sm text-muted-foreground">Three inputs from your team. Wayport prices everyone, plans around policy, and brings the exceptions back to you.</p>
             </div>
             <Button className="shadow-sm" onClick={lambda { navigate("/trips/new"); }}>
                 <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />
