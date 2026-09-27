@@ -1,5 +1,5 @@
 import from services.trips {
-    list_trips, plan_trip, get_trip, book_trip, get_memory,
+    list_trips, plan_trip, get_trip, book_trip, get_memory, gemini_status,
     TripSummary, TripView, ItemView, ActionView, MemoryInfo, MemoryEvent
 }
 import from services.voice { speak_text, SpeechResult }

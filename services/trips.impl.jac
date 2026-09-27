@@ -186,14 +186,20 @@ impl plan_trip(session_id: str, prompt: str, members: list[dict]) -> TripView {
             _log(trip, "MEMORY", "local", "memory_read", "No traveler facts stored yet", "INFO");
         }
         try {
+            _apply_gemini_key();
             draft = draft_plan(full_request, remembered);
-            _log(trip, "PLANNER", "llm", "itinerary_drafted", f"Drafted {len(draft.items)} items with the built-in model", "OK");
+            _log(trip, "PLANNER", "gemini", "itinerary_drafted", f"Gemini drafted {len(draft.items)} items using the configured model", "OK");
         } except Exception as e {
-            _log(trip, "PLANNER", "llm", "llm_unavailable", "Model call failed, using skeleton itinerary: " + str(e)[:120], "FAILED");
+            err = str(e);
+            category = "provider_error";
+            if "Missing Gemini API key" in err or "Missing credentials" in err { category = "missing_key"; }
+            elif "AuthenticationError" in err or "401" in err or "403" in err or "invalid api key" in err.lower() { category = "invalid_key"; }
+            elif "model" in err.lower() and ("not found" in err.lower() or "404" in err) { category = "model_error"; }
+            _log(trip, "PLANNER", "gemini", category, "Gemini request failed (" + category + "). Server detected a key; check that GEMINI_API_KEY is a valid Google AI Studio Gemini API key. Model: gemini/gemini-2.5-flash. Provider detail: " + err[:220], "FAILED");
             draft = PlanDraft(
                 title="Trip plan", destination="Your destination", days=3,
                 budget=1500.0,
-                summary="Fallback sample itinerary: Gemini was not called because GEMINI_API_KEY is missing. Add your key in Settings > Environment, restart the preview, and plan again for a Gemini-generated itinerary.",
+                summary="Fallback sample itinerary: the Gemini request reached the provider, but Google rejected the configured credential. Replace GEMINI_API_KEY with a valid Google AI Studio Gemini API key in Settings > Environment, save, restart, and try again.",
                 items=[
                     PlanItem(kind="FLIGHT", title="Outbound flight", day=0, hour=9.0, location="Home airport", price=320.0, notes="Morning departure"),
                     PlanItem(kind="HOTEL", title="Central hotel", day=0, hour=15.0, location="City center", price=450.0, notes="3 nights"),

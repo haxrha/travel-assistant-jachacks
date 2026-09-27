@@ -9,7 +9,7 @@ import from .ui.badge { Badge }
 import from "sonner" { toast }
 import from ..lib.session { get_session_id }
 import from ..lib.speech { play_speech, speech_recognition_supported, make_recognizer }
-sv import from ..services.trips { plan_trip, TripView }
+sv import from ..services.trips { plan_trip, gemini_status, TripView }
 sv import from ..services.voice { speak_text, SpeechResult }
 
 glob EXAMPLES: list[str] = [
@@ -23,6 +23,8 @@ def:pub NewTrip() -> JsxElement {
         listening: bool = False,
         planning: bool = False,
         status: str = "",
+        gemini_ready: bool = False,
+        active_model: str = "gemini/gemini-2.5-flash",
         error: str = "",
         recognizer: any = None,
         roster: list[dict] = [
@@ -32,6 +34,16 @@ def:pub NewTrip() -> JsxElement {
             {"name": "Carlos Reyes", "role": "Design", "preference": "Local architecture and walkable neighborhoods"}
         ];
     navigate = useNavigate();
+
+    async def check_gemini() -> None {
+        try {
+            cfg = await gemini_status();
+            gemini_ready = cfg["key_present"];
+            active_model = cfg["model"];
+        } except Exception {
+            gemini_ready = False;
+        }
+    }
 
     def stop_listening() -> None {
         if recognizer { recognizer.stop(); }
@@ -130,7 +142,12 @@ def:pub NewTrip() -> JsxElement {
                     </div>
                     {error and <p className="text-sm text-destructive">{error}</p>}
                     <div className="flex flex-wrap items-center justify-between gap-3">
-                        <span className="text-sm text-muted-foreground">{status}</span>
+                        <div className="flex flex-col gap-1">
+                            <span className={"text-xs font-medium " + ("text-emerald-400" if gemini_ready else "text-amber-400")}>{"Gemini key detected" if gemini_ready else "Check Gemini connection"}</span>
+                            <span className="text-xs text-muted-foreground">{"Model: " + active_model if gemini_ready else "Ensure GEMINI_API_KEY is saved in Settings > Environment."}</span>
+                            <span className="text-xs text-muted-foreground">{status}</span>
+                        </div>
+                        <Button variant="outline" size="sm" onClick={check_gemini}>Check Gemini</Button>
                         <Button size="lg" className="shadow-sm" disabled={planning or not prompt.strip()} onClick={submit}>
                             <HugeiconsIcon icon={SparklesIcon} strokeWidth={2} />
                             {"Planning..." if planning else "Plan trip"}

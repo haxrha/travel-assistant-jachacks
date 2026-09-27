@@ -4,12 +4,18 @@ import os;
 import json;
 import random;
 
-# Accept the Gemini key under any common name (litellm reads GEMINI_API_KEY).
-with entry {
-    if not os.environ.get("GEMINI_API_KEY") {
-        alt = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GOOGLE_GENERATIVE_AI_API_KEY") or "";
-        if alt { os.environ["GEMINI_API_KEY"] = alt; }
-    }
+# Normalize JacHammer's common Gemini key spellings before the LLM call.
+def _gemini_key() -> str {
+    return os.environ.get("GEMINI_API_KEY", "") or os.environ.get("GOOGLE_API_KEY", "") or os.environ.get("GOOGLE_GENERATIVE_AI_API_KEY", "") or "";
+}
+
+def:pub gemini_status() -> dict {
+    return {"key_present": bool(_gemini_key()), "model": "gemini/gemini-2.5-flash", "provider": "Gemini"};
+}
+
+def _apply_gemini_key() -> None {
+    key = _gemini_key();
+    if key { os.environ["GEMINI_API_KEY"] = key; }
 }
 import from datetime { datetime }
 import from services.memory { backboard_enabled, create_assistant, send_memory_message, MemoryReply }
