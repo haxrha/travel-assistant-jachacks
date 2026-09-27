@@ -1,7 +1,16 @@
 """WAYPORT travel graph: travelers, trips, itinerary items and the agent audit trail."""
 
+import os;
 import json;
 import random;
+
+# Accept the Gemini key under any common name (litellm reads GEMINI_API_KEY).
+with entry {
+    if not os.environ.get("GEMINI_API_KEY") {
+        alt = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GOOGLE_GENERATIVE_AI_API_KEY") or "";
+        if alt { os.environ["GEMINI_API_KEY"] = alt; }
+    }
+}
 import from datetime { datetime }
 import from services.memory { backboard_enabled, create_assistant, send_memory_message, MemoryReply }
 
