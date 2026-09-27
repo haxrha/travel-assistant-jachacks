@@ -24,7 +24,13 @@ def:pub NewTrip() -> JsxElement {
         planning: bool = False,
         status: str = "",
         error: str = "",
-        recognizer: any = None;
+        recognizer: any = None,
+        roster: list[dict] = [
+            {"name": "Alex Morgan", "role": "Product", "preference": "Aisle seat; vegetarian"},
+            {"name": "Jordan Lee", "role": "Engineering", "preference": "Quiet hotel; avoid red-eyes"},
+            {"name": "Samira Patel", "role": "Finance", "preference": "Keep team total below $4,000"},
+            {"name": "Carlos Reyes", "role": "Design", "preference": "Local architecture and walkable neighborhoods"}
+        ];
     navigate = useNavigate();
 
     def stop_listening() -> None {
@@ -65,7 +71,7 @@ def:pub NewTrip() -> JsxElement {
         error = "";
         status = "Planner agent is recalling your preferences and drafting the itinerary...";
         try {
-            trip: TripView = await plan_trip(get_session_id(), prompt);
+            trip: TripView = await plan_trip(get_session_id(), prompt, roster);
             line = "Your " + trip.title + " is ready. " + trip.summary;
             status = "Speaking the confirmation...";
             try {
@@ -87,10 +93,14 @@ def:pub NewTrip() -> JsxElement {
         <div className="flex flex-col gap-6 lg:col-span-2">
             <div className="flex flex-col gap-1">
                 <h1 className="text-2xl font-semibold tracking-tight">Plan a trip by voice</h1>
-                <p className="text-sm text-muted-foreground">Tap the mic and talk like you would to a travel agent. The planner agent remembers what you tell it for every future trip.</p>
+                <p className="text-sm text-muted-foreground">Plan a company offsite with a shared budget, team preferences and a decision trail.</p>
             </div>
             <Card className="shadow-sm">
                 <CardContent className="flex flex-col gap-6 pt-2">
+                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-muted/40 pt-3 pb-3 pl-4 pr-4">
+                        <div><p className="text-sm font-medium">Wayport Labs · Lisbon offsite</p><p className="text-xs text-muted-foreground">3 days · 4 teammates · $4,000 shared budget</p></div>
+                        <Button variant="outline" size="sm" onClick={lambda { prompt = "Plan a 3-day company offsite in Lisbon for Wayport Labs. Total team budget is $4,000. Include flights, centrally located lodging, a team dinner and a half-day strategy session."; }}>Load demo trip</Button>
+                    </div>
                     <div className="flex flex-col items-center gap-4 pt-4 pb-2">
                         <button
                             type="button"
@@ -135,6 +145,17 @@ def:pub NewTrip() -> JsxElement {
                 <CardDescription>Every step lands in the trip's audit trail.</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
+                <div className="rounded-xl border bg-muted/40 p-3">
+                    <p className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground">WAYPORT LABS · SAMPLE TEAM</p>
+                    <div className="flex flex-col gap-2">
+                        {for person in roster {
+                            <div key={person["name"]} className="flex items-start justify-between gap-2 text-xs">
+                                <span className="font-medium">{person["name"]}</span>
+                                <span className="max-w-[60%] text-right text-muted-foreground">{person["role"] + " · " + person["preference"]}</span>
+                            </div>
+                        }}
+                    </div>
+                </div>
                 <div className="flex items-start gap-3">
                     <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"><HugeiconsIcon icon={AiBrain01Icon} strokeWidth={2} className="size-4" /></div>
                     <div><p className="text-sm font-medium">Memory agent <Badge variant="secondary" className="ml-1">Backboard</Badge></p><p className="text-xs text-muted-foreground">Opens a new thread on your personal assistant with memory Auto, recalling facts from past trips.</p></div>

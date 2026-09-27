@@ -35,6 +35,12 @@ node Trip {
         created_at: str = "";
 }
 
+node TripMember {
+    has name: str = "",
+        role: str = "",
+        preference: str = "";
+}
+
 node TripItem {
     has kind: str = "ACTIVITY",
         title: str = "",
@@ -75,13 +81,13 @@ sem PlanItem.price = "Realistic price in USD (hotel = total for the stay).";
 sem PlanItem.notes = "One short tip, mention which remembered preference it satisfies if any.";
 
 obj PlanDraft {
-    has title: str,
-        destination: str,
-        days: int,
-        budget: float,
-        summary: str,
-        items: list[PlanItem],
-        learned_preferences: list[str];
+    has title: str = "",
+        destination: str = "",
+        days: int = 3,
+        budget: float = 0.0,
+        summary: str = "",
+        items: list[PlanItem] = [],
+        learned_preferences: list[str] = [];
 }
 sem PlanDraft.title = "Short trip title like 'Lisbon long weekend'.";
 sem PlanDraft.budget = "Total budget in USD from the request, or a sensible estimate.";
@@ -116,7 +122,7 @@ obj TripView {
         days: int = 0, budget: float = 0.0, total_cost: float = 0.0,
         summary: str = "", status: str = "", memory_mode: str = "local",
         thread_id: str = "", items: list[ItemView] = [],
-        actions: list[ActionView] = [], found: bool = False;
+        actions: list[ActionView] = [], members: list[dict] = [], found: bool = False;
 }
 
 obj MemoryEvent {
@@ -139,7 +145,7 @@ def _financial_check(trip: Trip) -> float;
 
 # ---------------- Endpoints ----------------
 def:pub list_trips(session_id: str) -> list[TripSummary];
-def:pub plan_trip(session_id: str, prompt: str) -> TripView;
+def:pub plan_trip(session_id: str, prompt: str, members: list[dict] = []) -> TripView;
 def:pub get_trip(session_id: str, trip_id: str) -> TripView;
 def:pub book_trip(session_id: str, trip_id: str) -> TripView;
 def:pub get_memory(session_id: str) -> MemoryInfo;

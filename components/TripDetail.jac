@@ -127,6 +127,7 @@ def:pub TripDetail() -> JsxElement {
     pct = min(100, int(t.total_cost / t.budget * 100)) if t.budget > 0 else 0;
     over = t.budget > 0 and t.total_cost > t.budget;
     mem_count = len([a for a in t.actions if a.agent == "MEMORY"]);
+    people: list[dict] = t.members;
 
     return <div className="flex flex-col gap-6">
         <Link to="/trips" className="flex w-fit items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
@@ -185,6 +186,20 @@ def:pub TripDetail() -> JsxElement {
                 }}
             </div>
             <div className="flex flex-col gap-6">
+                <Card className="shadow-sm">
+                    <CardHeader>
+                        <CardTitle>Company travelers</CardTitle>
+                        <CardDescription>{str(len(people)) + " teammates · preferences shared with planner"}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex flex-col gap-3">
+                        {for person in people {
+                            <div key={person["name"]} className="flex flex-col gap-0.5 rounded-lg border bg-card pt-2.5 pb-2.5 pl-3 pr-3">
+                                <div className="flex items-center justify-between gap-2"><span className="text-sm font-medium">{person["name"]}</span><Badge variant="outline">{person["role"]}</Badge></div>
+                                <span className="text-xs text-muted-foreground">{person["preference"]}</span>
+                            </div>
+                        }}
+                    </CardContent>
+                </Card>
                 <Card className="shadow-sm">
                     <CardHeader>
                         <CardTitle>Budget</CardTitle>

@@ -34,7 +34,7 @@ def:pub AppLayout() -> JsxElement {
     if path.startswith("/trips/") and path != "/trips/new" { title = "Trip"; }
     return <SidebarProvider>
         <Sidebar variant="inset">
-            <SidebarHeader><div className="pt-1 pb-1 pl-2 pr-2"><BrandMark /></div></SidebarHeader>
+            <SidebarHeader><div className="flex flex-col gap-2 pt-1 pb-3 pl-2 pr-2"><BrandMark /><p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">TEAM TRAVEL DESK</p></div></SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupLabel>Agents</SidebarGroupLabel>
@@ -53,9 +53,10 @@ def:pub AppLayout() -> JsxElement {
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter>
-                <div className="rounded-lg bg-sidebar-accent/60 pt-3 pb-3 pl-3 pr-3 text-xs text-muted-foreground">
-                    <p className="font-medium text-foreground">Demo traveler</p>
-                    <p>Memory powered by Backboard, voice by ElevenLabs.</p>
+                <div className="rounded-lg border border-sidebar-border bg-sidebar-accent/60 pt-3 pb-3 pl-3 pr-3 text-xs text-muted-foreground">
+                    <p className="font-medium text-foreground">WAYPORT LABS</p>
+                    <p>Agentic travel, built around your team.</p>
+                    <div className="mt-2 flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-primary" /><span>Planner · Memory · Finance</span></div>
                 </div>
             </SidebarFooter>
         </Sidebar>

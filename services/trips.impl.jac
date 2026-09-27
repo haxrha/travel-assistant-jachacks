@@ -53,7 +53,9 @@ impl _trip_view(trip: Trip) -> TripView {
         prompt=trip.prompt, days=trip.days, budget=trip.budget,
         total_cost=total, summary=trip.summary, status=trip.status,
         memory_mode=trip.memory_mode, thread_id=trip.thread_id, items=items,
-        actions=actions, found=True
+        actions=actions,
+        members=[{"name": m.name, "role": m.role, "preference": m.preference} for m in [trip -->][?:TripMember]],
+        found=True
     );
 }
 
@@ -158,12 +160,21 @@ impl list_trips(session_id: str) -> list[TripSummary] {
     return out;
 }
 
-impl plan_trip(session_id: str, prompt: str) -> TripView {
+impl plan_trip(session_id: str, prompt: str, members: list[dict]) -> TripView {
     traveler = _get_traveler(session_id);
     trip = traveler ++> Trip(prompt=prompt, created_at=_now(), title="Planning...");
+    member_context = "";
+    for member in members {
+        name = str(member.get("name", "Traveler"));
+        role = str(member.get("role", ""));
+        preference = str(member.get("preference", ""));
+        trip ++> TripMember(name=name, role=role, preference=preference);
+        member_context += f"\n{name} ({role}): {preference}";
+    }
+    full_request = prompt + ("\nCompany travelers:" + member_context if member_context else "");
     _log(trip, "PLANNER", "intake", "request_received", prompt[:240], "INFO");
 
-    draft = _plan_with_backboard(traveler, trip, prompt);
+    draft = _plan_with_backboard(traveler, trip, full_request);
     if draft != None {
         trip.memory_mode = "backboard";
     } else {
@@ -175,14 +186,14 @@ impl plan_trip(session_id: str, prompt: str) -> TripView {
             _log(trip, "MEMORY", "local", "memory_read", "No traveler facts stored yet", "INFO");
         }
         try {
-            draft = draft_plan(prompt, remembered);
+            draft = draft_plan(full_request, remembered);
             _log(trip, "PLANNER", "llm", "itinerary_drafted", f"Drafted {len(draft.items)} items with the built-in model", "OK");
         } except Exception as e {
             _log(trip, "PLANNER", "llm", "llm_unavailable", "Model call failed, using skeleton itinerary: " + str(e)[:120], "FAILED");
             draft = PlanDraft(
                 title="Trip plan", destination="Your destination", days=3,
                 budget=1500.0,
-                summary="A starter itinerary. Add an LLM key in Settings for a tailored plan.",
+                summary="Fallback sample itinerary: Gemini was not called because GEMINI_API_KEY is missing. Add your key in Settings > Environment, restart the preview, and plan again for a Gemini-generated itinerary.",
                 items=[
                     PlanItem(kind="FLIGHT", title="Outbound flight", day=0, hour=9.0, location="Home airport", price=320.0, notes="Morning departure"),
                     PlanItem(kind="HOTEL", title="Central hotel", day=0, hour=15.0, location="City center", price=450.0, notes="3 nights"),

@@ -13,14 +13,15 @@ api_key = "${GEMINI_API_KEY:-}"
 
 [jac-shadcn]
 style = "vega"
-baseColor = "stone"
+baseColor = "zinc"
 theme = "teal"
-font = "figtree"
+font = "geist"
 radius = "medium"
 menuAccent = "bold"
 menuColor = "default"
 [dependencies]
 [dependencies.npm]
+"@fontsource-variable/geist" = "*"
 "@fontsource-variable/figtree" = "*"
 react = "^18.2.0"
 react-dom = "^18.2.0"
